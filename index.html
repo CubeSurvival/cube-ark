@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Survival Game</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <p>Health: <span id="health">100</span></p>
+        <p>Hunger: <span id="hunger">100</span></p>
+        <p>Food: <span id="food">0</span></p>
+        <p>Press 'K' to Kill Animal (Simulation)</p>
+        <p>Press 'C' to Cook Food</p>
+	<p id="message"></p>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Set up the basic Three.js scene
+        let scene = new THREE.Scene();
+        let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        let renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Player stats
+        let player = {
+            health: 100,
+            hunger: 100,
+            food: 0,
+            speed: 0.1, // Player movement speed
+            rotationSpeed: 0.05, // Rotation speed for the player
+            velocity: new THREE.Vector3(0, 0, 0), // Movement velocity
+            direction: new THREE.Vector3(0, 0, 0), // Direction the player is facing
+        };
+
+        // UI elements
+        const healthElement = document.getElementById("health");
+        const hungerElement = document.getElementById("hunger");
+        const foodElement = document.getElementById("food");
+
+        // Animal class for easy manipulation of animals
+        class Animal {
+            constructor(x, z) {
+                this.geometry = new THREE.BoxGeometry(1, 1, 1);
+                this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+                this.model = new THREE.Mesh(this.geometry, this.material);
+                this.model.position.set(x, 0.5, z);
+                scene.add(this.model);
+
+                // Animal movement properties
+                this.speed = 0.02;
+                this.direction = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
+                this.alive = true;
+            }
+
+            move() {
+                if (this.alive) {
+                    // Random movement within a small range
+                    this.model.position.addScaledVector(this.direction, this.speed);
+
+                    // If the animal reaches the edge of a predefined area, change direction
+                    if (Math.abs(this.model.position.x) > 10 || Math.abs(this.model.position.z) > 10) {
+                        this.direction = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
+                    }
+                }
+            }
+
+            kill() {
+                if (this.alive) {
+                    this.alive = false;
+                    this.model.material.color.set(0xff0000); // Turn the animal red when killed
+                    return true;
+                }
+                return false;
+            }
+
+            dropMeat() {
+                if (!this.alive) {
+                    return true; // The animal drops meat when killed
+                }
+                return false;
+            }
+        }
+
+        // Create multiple animals
+        let animals = [];
+        for (let i = 0; i < 5; i++) {
+            animals.push(new Animal(Math.random() * 20 - 10, Math.random() * 20 - 10));
+        }
+
+        // Create the player (cube)
+        let playerGeometry = new THREE.BoxGeometry(1, 1, 1);
+        let playerMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+        let playerModel = new THREE.Mesh(playerGeometry, playerMaterial);
+        scene.add(playerModel);
+
+	// Create ground with simple terrain
+	let groundGeometry = new THREE.PlaneGeometry(200, 200, 50, 50); // bigger map with subdivisions
+
+	let groundMaterial = new THREE.MeshBasicMaterial({ color: 0x228B22, wireframe: false });
+	let ground = new THREE.Mesh(groundGeometry, groundMaterial);
+	ground.rotation.x = -Math.PI / 2; // Rotate plane to be horizontal
+	scene.add(ground);
+		
+
+        // Camera settings
+        let cameraOffset = new THREE.Vector3(0, 2, -5); // Camera offset behind the player
+        camera.position.set(cameraOffset.x, cameraOffset.y, cameraOffset.z);
+        camera.lookAt(playerModel.position);
+
+        // Simple camera movement for the player
+        let keys = {};
+
+        window.addEventListener("keydown", (event) => {
+            keys[event.key] = true;
+        });
+
+        window.addEventListener("keyup", (event) => {
+            keys[event.key] = false;
+        });
+
+        // Handle player movement
+        function movePlayer() {
+            let direction = new THREE.Vector3(0, 0, 0);
+
+            // Reverse the controls to fix the backward issue
+            if (keys["w"]) direction.z = 1; // Move forward when pressing "W"
+            if (keys["s"]) direction.z = -1; // Move backward when pressing "S"
+            if (keys["a"]) direction.x = 1; // Move left when pressing "A"
+            if (keys["d"]) direction.x = -1;  // Move right when pressing "D"
+
+            // Normalize to avoid faster diagonal movement
+            direction.normalize();
+
+            // Move the player based on the direction
+            playerModel.position.addScaledVector(direction, player.speed);
+
+            // Update the player's facing direction (turn the player model)
+            if (direction.length() > 0) {
+                let angle = Math.atan2(direction.x, direction.z); // Calculate the angle to face
+                playerModel.rotation.y = angle; // Update the player's rotation to face the new direction
+            }
+        }
+
+        // Camera follows behind the player (ARK-like)
+        function updateCamera() {
+            // Calculate the camera's target position behind the player
+            let targetPosition = playerModel.position.clone().add(cameraOffset);
+
+            // Smoothly interpolate the camera's position to the target position
+            camera.position.lerp(targetPosition, 0.1);
+
+            // Camera looks at the player
+            camera.lookAt(playerModel.position);
+        }
+
+        // Check for animal killing (press 'K' to kill nearby animals)
+        function killAnimal() {
+            for (let animal of animals) {
+                let distance = playerModel.position.distanceTo(animal.model.position);
+                if (distance < 2 && animal.alive) { // Player is close enough to the animal
+                    if (animal.kill()) {
+                        player.food += 1;
+                        updateUI();
+                        updateUI("You killed an animal! Food collected.");
+                    }
+                }
+            }
+        }
+
+        // Cooking (press 'C' to simulate cooking)
+        function cookFood() {
+            if (player.food > 0 && player.hunger < 100) {
+                player.food -= 1;
+                player.hunger += 20; // Cooking restores hunger
+                if (player.hunger > 100) player.hunger = 100;
+                updateUI();
+                updateUI("You cooked food.");
+            }
+        }
+
+        // Update the UI display for health, hunger, and food
+	const messageElement = document.getElementById("message");
+
+	function updateUI(message = "") {
+   	healthElement.textContent = player.health;
+    	hungerElement.textContent = player.hunger;
+    	foodElement.textContent = player.food;
+    	messageElement.textContent = message; // Display the message
+	}
+
+        // Animate the scene
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Update animal movements
+            for (let animal of animals) {
+                animal.move();
+            }
+
+            // Update player movement
+            movePlayer();
+
+            // Update camera position to follow the player smoothly
+            updateCamera();
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Resize the canvas when the window is resized
+        window.addEventListener("resize", () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
+        // Handle key presses for killing and cooking
+        window.addEventListener("keydown", (event) => {
+            if (event.key === "k") {
+                killAnimal();
+            }
+            if (event.key === "c") {
+                cookFood();
+            }
+        });
+    </script>
+</body>
+</html>
