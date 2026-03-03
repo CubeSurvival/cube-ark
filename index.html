@@ -193,15 +193,26 @@
         }
 
         // Update the UI display for health, hunger, and food
-	const messageElement = document.getElementById("message");
+	let messageTimeout; // Keep track of the current timeout
 
-	function updateUI(message = "") {
-   	healthElement.textContent = player.health;
-    	hungerElement.textContent = player.hunger;
-    	foodElement.textContent = player.food;
-    	messageElement.textContent = message; // Display the message
-	}
+function updateUI(message = "") {
+    healthElement.textContent = player.health;
+    hungerElement.textContent = player.hunger;
+    foodElement.textContent = player.food;
 
+    // Show message if provided
+    messageElement.textContent = message;
+
+    // Clear any previous timeout so messages don't stack
+    if (messageTimeout) clearTimeout(messageTimeout);
+
+    // Hide the message after 3 seconds
+    if (message !== "") {
+        messageTimeout = setTimeout(() => {
+            messageElement.textContent = "";
+        }, 3000);
+    }
+}
         // Animate the scene
         function animate() {
             requestAnimationFrame(animate);
@@ -241,3 +252,4 @@
     </script>
 </body>
 </html>
+
