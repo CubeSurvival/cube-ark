@@ -170,9 +170,9 @@ for (let i = 0; i < treeCount; i++) {
 		
 
         // Camera settings
-        let cameraOffset = new THREE.Vector3(0, 5, -10); // Camera offset behind the player
-        camera.position.set(cameraOffset.x, cameraOffset.y, cameraOffset.z);
-        camera.lookAt(playerModel.position);
+        let cameraOffset = new THREE.Vector3(0, 10, -15);
+		camera.position.copy(playerModel.position.clone().add(cameraOffset));
+		camera.lookAt(playerModel.position);
 
         // Simple camera movement for the player
         let keys = {};
@@ -317,6 +317,7 @@ for (let i = meatDrops.length - 1; i >= 0; i--) {
     </script>
 </body>
 </html>
+
 
 
 
