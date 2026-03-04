@@ -66,7 +66,7 @@
             constructor(x, z) {
                 this.geometry = new THREE.BoxGeometry(1, 1, 1);
                 this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-                this.model = new THREE.Mesh(this.geometry, this.material);
+                this.material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
                 this.model.position.set(x, 0.5, z);
                 scene.add(this.model);
 
@@ -95,7 +95,7 @@ kill() {
 
         // Drop meat at the animal's position
         const meatGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-        const meatMaterial = new THREE.MeshBasicMaterial({ color: 0xffa500 }); // orange
+        const meatMaterial = new THREE.MeshStandardMaterial({ color: 0xffa500 });
         const meat = new THREE.Mesh(meatGeometry, meatMaterial);
         meat.position.copy(this.model.position);
         scene.add(meat);
@@ -131,7 +131,7 @@ kill() {
 
         // Create the player (cube)
         let playerGeometry = new THREE.BoxGeometry(1, 1, 1);
-        let playerMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+        let playerMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff });
         let playerModel = new THREE.Mesh(playerGeometry, playerMaterial);
         scene.add(playerModel);
 
@@ -151,14 +151,14 @@ for (let i = 0; i < treeCount; i++) {
 
     // Tree trunk
     let trunkGeometry = new THREE.CylinderGeometry(0.5, 0.5, 5, 8);
-    let trunkMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 }); // brown
+    let trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
     let trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
     trunk.position.set(x, 2.5, z); // 2.5 because height/2
     scene.add(trunk);
 
     // Tree leaves
     let leavesGeometry = new THREE.ConeGeometry(2, 5, 8);
-    let leavesMaterial = new THREE.MeshBasicMaterial({ color: 0x006400 }); // dark green
+    let leavesMaterial = new THREE.MeshStandardMaterial({ color: 0x006400 });
     let leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
     leaves.position.set(x, 5 + 2.5, z); // trunk height + cone height / 2
     scene.add(leaves);
@@ -317,6 +317,7 @@ for (let i = meatDrops.length - 1; i >= 0; i--) {
     </script>
 </body>
 </html>
+
 
 
 
