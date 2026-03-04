@@ -193,7 +193,15 @@
         }
 
         // Update the UI display for health, hunger, and food
-	let messageTimeout; // Keep track of the current timeout
+		const messageElement = document.getElementById("message");
+
+	function updateUI(message = "") {
+   	healthElement.textContent = player.health;
+    	hungerElement.textContent = player.hunger;
+    	foodElement.textContent = player.food;
+    	messageElement.textContent = message; // Display the message
+	}
+		let messageTimeout; // Keep track of the current timeout
 
 function updateUI(message = "") {
     healthElement.textContent = player.health;
@@ -252,4 +260,5 @@ function updateUI(message = "") {
     </script>
 </body>
 </html>
+
 
