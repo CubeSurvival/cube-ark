@@ -75,7 +75,6 @@
                     // If the animal reaches the edge of a predefined area, change direction
                     if (Math.abs(this.model.position.x) > 250 || Math.abs(this.model.position.z) > 250) {
 				this.direction = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
-			}
 					}
                 }
             }
@@ -268,25 +267,24 @@ function updateUI(message = "") {
     // Update player movement
     movePlayer();
 
-    // Check if player is near any meat
-    for (let i = meatDrops.length - 1; i >= 0; i--) {
-        const meat = meatDrops[i];
-        const distance = playerModel.position.distanceTo(meat.position);
+   // Check if player is near any meat
+for (let i = meatDrops.length - 1; i >= 0; i--) {
+    const meat = meatDrops[i];
+    const distance = playerModel.position.distanceTo(meat.position);
 
-        if (distance < 2) { // player is close enough
-            player.food += 1;
-            updateUI("You picked up food!");
-            scene.remove(meat);
-            meat.geometry.dispose();
-            meat.material.dispose();
-            meatDrops.splice(i, 1); // remove from array
-        }
+    if (distance < 2) { // player is close enough
+        // Give random 1-5 food
+        const foodAmount = Math.floor(Math.random() * 5) + 1; // 1 to 5
+        player.food += foodAmount;
+
+        updateUI(`You picked up ${foodAmount} food!`);
+
+        // Remove the meat block
+        scene.remove(meat);
+        meat.geometry.dispose();
+        meat.material.dispose();
+        meatDrops.splice(i, 1); // remove from array
     }
-
-    // Update camera position to follow the player smoothly
-    updateCamera();
-
-    renderer.render(scene, camera);
 }
 
         animate();
@@ -309,6 +307,7 @@ function updateUI(message = "") {
     </script>
 </body>
 </html>
+
 
 
 
