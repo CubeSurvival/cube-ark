@@ -320,13 +320,6 @@ kill() {
 	}
 		let messageTimeout; // Keep track of the current timeout
 
-function updateUI(message = "") {
-    healthElement.textContent = player.health;
-    hungerElement.textContent = player.hunger;
-    foodElement.textContent = player.food;
-	woodElement.textContent = player.wood;
-	stoneElement.textContent = player.stone;
-
     // Show message if provided
     messageElement.textContent = message;
 
@@ -371,6 +364,29 @@ function animate() {
 	        meatDrops.splice(i, 1); // remove from array
 	    }
 	}
+	// Pick up sticks
+for (let i = sticks.length - 1; i >= 0; i--) {
+    if (playerModel.position.distanceTo(sticks[i].position) < 2) {
+        player.wood += 1;
+        scene.remove(sticks[i]);
+        sticks[i].geometry.dispose();
+        sticks[i].material.dispose();
+        sticks.splice(i, 1);
+        updateUI("Picked up a stick!");
+    }
+}
+
+// Pick up rocks
+for (let i = rocks.length - 1; i >= 0; i--) {
+    if (playerModel.position.distanceTo(rocks[i].position) < 2) {
+        player.stone += 1;
+        scene.remove(rocks[i]);
+        rocks[i].geometry.dispose();
+        rocks[i].material.dispose();
+        rocks.splice(i, 1);
+        updateUI("Picked up a rock!");
+    }
+}
 
     // Update camera position to follow the player smoothly
     updateCamera();
@@ -413,29 +429,11 @@ window.addEventListener("keydown", (event) => {
     }
 
 });
-			// Pick up sticks
-		for (let i = sticks.length - 1; i >= 0; i--) {
-		    if (playerModel.position.distanceTo(sticks[i].position) < 2) {
-		        player.wood += 1;
-		        scene.remove(sticks[i]);
-		        sticks.splice(i, 1);
-		        updateUI("Picked up a stick!");
-		    }
-		}
-		
-		// Pick up rocks
-		for (let i = rocks.length - 1; i >= 0; i--) {
-		    if (playerModel.position.distanceTo(rocks[i].position) < 2) {
-		        player.stone += 1;
-		        scene.remove(rocks[i]);
-		        rocks.splice(i, 1);
-		        updateUI("Picked up a rock!");
-		    }
-		}
         });
     </script>
 </body>
 </html>
+
 
 
 
