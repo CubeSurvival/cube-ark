@@ -129,15 +129,6 @@ kill() {
     	animals.push(new Animal(x, z));
 		}
 
-        // Create the player (cube)
-		let playerGeometry = new THREE.BoxGeometry(1, 1, 1);
-		let playerMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff });
-		let playerModel = new THREE.Mesh(playerGeometry, playerMaterial);
-		scene.add(playerModel);
-		let cameraOffset = new THREE.Vector3(0, 10, -15);
-		camera.position.copy(playerModel.position.clone().add(cameraOffset));
-		camera.lookAt(playerModel.position);
-
 	// Create bigger ground
 	let groundGeometry = new THREE.PlaneGeometry(500, 500, 100, 100);
 	let groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 });
@@ -148,6 +139,16 @@ kill() {
 const treeCount = 200; // number of trees
 
 for (let i = 0; i < treeCount; i++) {
+	
+	 // Create the player (cube)
+	let playerGeometry = new THREE.BoxGeometry(1, 1, 1);
+	let playerMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff });
+	let playerModel = new THREE.Mesh(playerGeometry, playerMaterial);
+	scene.add(playerModel);
+	let cameraOffset = new THREE.Vector3(0, 10, -15);
+	camera.position.copy(playerModel.position.clone().add(cameraOffset));
+	camera.lookAt(playerModel.position);
+	
     // Random X and Z on the map
     let x = Math.random() * 500 - 250; 
     let z = Math.random() * 500 - 250;
@@ -316,6 +317,7 @@ function updateUI(message = "") {
     </script>
 </body>
 </html>
+
 
 
 
