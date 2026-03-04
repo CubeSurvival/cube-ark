@@ -30,6 +30,14 @@
     <script>
         // Set up the basic Three.js scene
         let scene = new THREE.Scene();
+
+		// Add lights
+		let light = new THREE.DirectionalLight(0xffffff, 1);
+		light.position.set(50, 100, 50);
+		scene.add(light);
+		
+		let ambientLight = new THREE.AmbientLight(0x404040, 0.5); // soft light
+		scene.add(ambientLight);
         let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         let renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -51,6 +59,7 @@
         const healthElement = document.getElementById("health");
         const hungerElement = document.getElementById("hunger");
         const foodElement = document.getElementById("food");
+		const messageElement = document.getElementById("message");
 
         // Animal class for easy manipulation of animals
         class Animal {
@@ -308,6 +317,7 @@ for (let i = meatDrops.length - 1; i >= 0; i--) {
     </script>
 </body>
 </html>
+
 
 
 
