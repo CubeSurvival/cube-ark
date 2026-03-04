@@ -262,7 +262,8 @@ function updateUI(message = "") {
             renderer.setSize(window.innerWidth, window.innerHeight);
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
-			// Check if player is near any meat
+        });
+		// Check if player is near any meat
 		for (let i = meatDrops.length - 1; i >= 0; i--) {
 		    const meat = meatDrops[i];
 		    const distance = playerModel.position.distanceTo(meat.position);
@@ -276,7 +277,6 @@ function updateUI(message = "") {
 		        meatDrops.splice(i, 1); // remove from array
 		    }
 		}
-        });
 		
 
         // Handle key presses for killing and cooking
@@ -291,6 +291,7 @@ function updateUI(message = "") {
     </script>
 </body>
 </html>
+
 
 
 
