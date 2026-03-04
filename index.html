@@ -25,6 +25,15 @@
         <p>Press 'K' to Kill Animal (Simulation)</p>
         <p>Press 'C' to Cook Food</p>
 	<p id="message"></p>
+		<p>Wood: <span id="wood">0</span></p>
+		<p>Stone: <span id="stone">0</span></p>
+		<p>Press 'E' to Open Craft Menu</p>
+		
+		<div id="craftMenu" style="display:none; background:black; padding:10px; margin-top:10px;">
+	    <p>--- Crafting ---</p>
+	    <p>1 = Campfire (3 Wood, 2 Stone)</p>
+	    <p>2 = Crafting Table (5 Wood)</p>
+</div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
@@ -39,6 +48,8 @@
         let player = {
             health: 100,
             hunger: 100,
+			wood: 0,
+    		stone: 0,
             food: 0,
             speed: 0.1, // Player movement speed
             rotationSpeed: 0.05, // Rotation speed for the player
@@ -51,6 +62,9 @@
         const healthElement = document.getElementById("health");
         const hungerElement = document.getElementById("hunger");
         const foodElement = document.getElementById("food");
+		const woodElement = document.getElementById("wood");
+		const stoneElement = document.getElementById("stone");
+		const craftMenu = document.getElementById("craftMenu");
 
         // Animal class for easy manipulation of animals
         class Animal {
@@ -159,7 +173,67 @@ kill() {
 	    // Store in array (optional, useful if you want to remove trees later)
 	    trees.push({ trunk, leaves });
 	}
+		let sticks = [];
+		let rocks = [];
 		
+		// Spawn sticks
+		for (let i = 0; i < 100; i++) {
+		    let geo = new THREE.BoxGeometry(0.3, 0.3, 1);
+		    let mat = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
+		    let stick = new THREE.Mesh(geo, mat);
+		    stick.position.set(Math.random()*500-250, 0.15, Math.random()*500-250);
+		    scene.add(stick);
+		    sticks.push(stick);
+		}
+		
+		// Spawn rocks
+		for (let i = 0; i < 80; i++) {
+		    let geo = new THREE.DodecahedronGeometry(0.5);
+		    let mat = new THREE.MeshBasicMaterial({ color: 0x808080 });
+		    let rock = new THREE.Mesh(geo, mat);
+		    rock.position.set(Math.random()*500-250, 0.5, Math.random()*500-250);
+		    scene.add(rock);
+		    rocks.push(rock);
+}
+		function craftItem(key) {
+	    // Campfire
+	    if (key === "1") {
+	        if (player.wood >= 3 && player.stone >= 2) {
+	            player.wood -= 3;
+	            player.stone -= 2;
+	            spawnCampfire();
+	            updateUI("Crafted Campfire!");
+	        } else {
+	            updateUI("Not enough materials!");
+	        }
+	    }
+	
+	    // Crafting table
+	    if (key === "2") {
+	        if (player.wood >= 5) {
+	            player.wood -= 5;
+	            spawnCraftTable();
+	            updateUI("Crafted Crafting Table!");
+	        } else {
+	            updateUI("Not enough wood!");
+	        }
+	    }
+	}
+		function spawnCampfire() {
+	    let geo = new THREE.ConeGeometry(1, 2, 8);
+	    let mat = new THREE.MeshBasicMaterial({ color: 0xff4500 });
+	    let fire = new THREE.Mesh(geo, mat);
+	    fire.position.copy(playerModel.position);
+	    scene.add(fire);
+	}
+		function spawnCraftTable() {
+	    let geo = new THREE.BoxGeometry(2, 1.5, 2);
+	    let mat = new THREE.MeshBasicMaterial({ color: 0x654321 });
+	    let table = new THREE.Mesh(geo, mat);
+	    table.position.copy(playerModel.position);
+	    table.position.y = 0.75;
+	    scene.add(table);
+	}
 
         // Camera settings
         let cameraOffset = new THREE.Vector3(0, 2, -5); // Camera offset behind the player
@@ -250,6 +324,8 @@ function updateUI(message = "") {
     healthElement.textContent = player.health;
     hungerElement.textContent = player.hunger;
     foodElement.textContent = player.food;
+	woodElement.textContent = player.wood;
+	stoneElement.textContent = player.stone;
 
     // Show message if provided
     messageElement.textContent = message;
@@ -313,17 +389,54 @@ function animate() {
 		
 
         // Handle key presses for killing and cooking
-        window.addEventListener("keydown", (event) => {
-            if (event.key === "k") {
-                killAnimal();
-            }
-            if (event.key === "c") {
-                cookFood();
-            }
+window.addEventListener("keydown", (event) => {
+
+    // Kill animal
+    if (event.key === "k") {
+        killAnimal();
+    }
+
+    // Cook food
+    if (event.key === "c") {
+        cookFood();
+    }
+
+    // Toggle craft menu
+    if (event.key === "e") {
+        craftMenu.style.display =
+            craftMenu.style.display === "none" ? "block" : "none";
+    }
+
+    // Crafting (only works if menu is open)
+    if (craftMenu.style.display === "block") {
+        craftItem(event.key);
+    }
+
+});
+			// Pick up sticks
+		for (let i = sticks.length - 1; i >= 0; i--) {
+		    if (playerModel.position.distanceTo(sticks[i].position) < 2) {
+		        player.wood += 1;
+		        scene.remove(sticks[i]);
+		        sticks.splice(i, 1);
+		        updateUI("Picked up a stick!");
+		    }
+		}
+		
+		// Pick up rocks
+		for (let i = rocks.length - 1; i >= 0; i--) {
+		    if (playerModel.position.distanceTo(rocks[i].position) < 2) {
+		        player.stone += 1;
+		        scene.remove(rocks[i]);
+		        rocks.splice(i, 1);
+		        updateUI("Picked up a rock!");
+		    }
+		}
         });
     </script>
 </body>
 </html>
+
 
 
 
