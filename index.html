@@ -311,22 +311,19 @@ kill() {
 
         // Update the UI display for health, hunger, and food
 		const messageElement = document.getElementById("message");
+let messageTimeout;
 
-	function updateUI(message = "") {
-   	healthElement.textContent = player.health;
-    	hungerElement.textContent = player.hunger;
-    	foodElement.textContent = player.food;
-    	messageElement.textContent = message; // Display the message
-	}
-		let messageTimeout; // Keep track of the current timeout
+function updateUI(message = "") {
+    healthElement.textContent = player.health;
+    hungerElement.textContent = player.hunger;
+    foodElement.textContent = player.food;
+    woodElement.textContent = player.wood;
+    stoneElement.textContent = player.stone;
 
-    // Show message if provided
-    messageElement.textContent = message;
-
-    // Clear any previous timeout so messages don't stack
     if (messageTimeout) clearTimeout(messageTimeout);
 
-    // Hide the message after 3 seconds
+    messageElement.textContent = message;
+
     if (message !== "") {
         messageTimeout = setTimeout(() => {
             messageElement.textContent = "";
@@ -429,10 +426,10 @@ window.addEventListener("keydown", (event) => {
     }
 
 });
-        });
     </script>
 </body>
 </html>
+
 
 
 
