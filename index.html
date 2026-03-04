@@ -64,11 +64,11 @@
         // Animal class for easy manipulation of animals
         class Animal {
             constructor(x, z) {
-                this.geometry = new THREE.BoxGeometry(1, 1, 1);
-                this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-                this.material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-                this.model.position.set(x, 0.5, z);
-                scene.add(this.model);
+			this.geometry = new THREE.BoxGeometry(1, 1, 1);
+			this.material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+			this.model = new THREE.Mesh(this.geometry, this.material); // <-- create model!
+			this.model.position.set(x, 0.5, z);
+			scene.add(this.model);
 
                 // Animal movement properties
                 this.speed = 0.02;
@@ -134,10 +134,12 @@ kill() {
         let playerMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff });
         let playerModel = new THREE.Mesh(playerGeometry, playerMaterial);
         scene.add(playerModel);
+		camera.position.copy(playerModel.position.clone().add(cameraOffset));
+		camera.lookAt(playerModel.position);
 
 	// Create bigger ground
 	let groundGeometry = new THREE.PlaneGeometry(500, 500, 100, 100);
-	let groundMaterial = new THREE.MeshBasicMaterial({ color: 0x228B22, wireframe: false });
+	let groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 });
 	let ground = new THREE.Mesh(groundGeometry, groundMaterial);
 	ground.rotation.x = -Math.PI / 2; // horizontal
 	scene.add(ground);
@@ -317,6 +319,7 @@ for (let i = meatDrops.length - 1; i >= 0; i--) {
     </script>
 </body>
 </html>
+
 
 
 
