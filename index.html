@@ -114,7 +114,7 @@ kill() {
         }
 
         // Create multiple animals
-        for (let i = 0; i < 20; i++) { // more animals for bigger map
+        for (let i = 0; i < 70; i++) { // more animals for bigger map
     	let x = Math.random() * 500 - 250;
     	let z = Math.random() * 500 - 250;
     	animals.push(new Animal(x, z));
@@ -133,7 +133,7 @@ kill() {
 	ground.rotation.x = -Math.PI / 2; // horizontal
 	scene.add(ground);
 	let trees = [];
-const treeCount = 50; // number of trees
+const treeCount = 200; // number of trees
 
 for (let i = 0; i < treeCount; i++) {
     // Random X and Z on the map
@@ -308,6 +308,7 @@ function updateUI(message = "") {
     </script>
 </body>
 </html>
+
 
 
 
