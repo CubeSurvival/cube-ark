@@ -239,21 +239,36 @@ function updateUI(message = "") {
 }
         // Animate the scene
         function animate() {
-            requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 
-            // Update animal movements
-            for (let animal of animals) {
-                animal.move();
-            }
+    // Update animal movements
+    for (let animal of animals) {
+        animal.move();
+    }
 
-            // Update player movement
-            movePlayer();
+    // Update player movement
+    movePlayer();
 
-            // Update camera position to follow the player smoothly
-            updateCamera();
+    // Check if player is near any meat
+    for (let i = meatDrops.length - 1; i >= 0; i--) {
+        const meat = meatDrops[i];
+        const distance = playerModel.position.distanceTo(meat.position);
 
-            renderer.render(scene, camera);
+        if (distance < 2) { // player is close enough
+            player.food += 1;
+            updateUI("You picked up food!");
+            scene.remove(meat);
+            meat.geometry.dispose();
+            meat.material.dispose();
+            meatDrops.splice(i, 1); // remove from array
         }
+    }
+
+    // Update camera position to follow the player smoothly
+    updateCamera();
+
+    renderer.render(scene, camera);
+}
 
         animate();
 
@@ -263,22 +278,6 @@ function updateUI(message = "") {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
         });
-		// Check if player is near any meat
-		for (let i = meatDrops.length - 1; i >= 0; i--) {
-		    const meat = meatDrops[i];
-		    const distance = playerModel.position.distanceTo(meat.position);
-		
-		    if (distance < 2) { // player is close enough
-		        player.food += 1;
-		        updateUI("You picked up food!");
-		        scene.remove(meat);
-		        meat.geometry.dispose();
-		        meat.material.dispose();
-		        meatDrops.splice(i, 1); // remove from array
-		    }
-		}
-		
-
         // Handle key presses for killing and cooking
         window.addEventListener("keydown", (event) => {
             if (event.key === "k") {
@@ -291,6 +290,7 @@ function updateUI(message = "") {
     </script>
 </body>
 </html>
+
 
 
 
