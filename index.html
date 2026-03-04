@@ -45,6 +45,7 @@
             velocity: new THREE.Vector3(0, 0, 0), // Movement velocity
             direction: new THREE.Vector3(0, 0, 0), // Direction the player is facing
         };
+		let meatDrops = [];
 
         // UI elements
         const healthElement = document.getElementById("health");
@@ -83,14 +84,17 @@ kill() {
         this.alive = false;
         this.model.material.color.set(0xff0000); // Turn red
 
-        // Drop a meat cube at the animal's position
+        // Drop meat at the animal's position
         const meatGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-        const meatMaterial = new THREE.MeshBasicMaterial({ color: 0xffa500 }); // orange meat
+        const meatMaterial = new THREE.MeshBasicMaterial({ color: 0xffa500 }); // orange
         const meat = new THREE.Mesh(meatGeometry, meatMaterial);
         meat.position.copy(this.model.position);
         scene.add(meat);
 
-        // Remove the animal from the scene after 1 second
+        // Add meat to the meatDrops array
+        meatDrops.push(meat);
+
+        // Remove the animal mesh after 1 second
         setTimeout(() => {
             scene.remove(this.model);
             this.model.geometry.dispose();
@@ -101,7 +105,6 @@ kill() {
     }
     return false;
 }
-
             dropMeat() {
                 if (!this.alive) {
                     return true; // The animal drops meat when killed
@@ -188,9 +191,7 @@ kill() {
                 let distance = playerModel.position.distanceTo(animal.model.position);
                 if (distance < 2 && animal.alive) { // Player is close enough to the animal
                     if (animal.kill()) {
-                        player.food += 1;
-                        updateUI();
-                        updateUI("You killed an animal! Food collected.");
+                        updateUI("You killed an animal.");
                     }
                 }
             }
@@ -261,7 +262,22 @@ function updateUI(message = "") {
             renderer.setSize(window.innerWidth, window.innerHeight);
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
+			// Check if player is near any meat
+		for (let i = meatDrops.length - 1; i >= 0; i--) {
+		    const meat = meatDrops[i];
+		    const distance = playerModel.position.distanceTo(meat.position);
+		
+		    if (distance < 2) { // player is close enough
+		        player.food += 1;
+		        updateUI("You picked up food!");
+		        scene.remove(meat);
+		        meat.geometry.dispose();
+		        meat.material.dispose();
+		        meatDrops.splice(i, 1); // remove from array
+		    }
+		}
         });
+		
 
         // Handle key presses for killing and cooking
         window.addEventListener("keydown", (event) => {
@@ -275,6 +291,7 @@ function updateUI(message = "") {
     </script>
 </body>
 </html>
+
 
 
 
