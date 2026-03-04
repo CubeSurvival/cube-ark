@@ -33,11 +33,11 @@
         let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         let renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+        document.body.appendChild(renderer.dom
+            health: 100,Element);
 
         // Player stats
         let player = {
-            health: 100,
             hunger: 100,
             food: 0,
             speed: 0.1, // Player movement speed
@@ -114,10 +114,11 @@ kill() {
         }
 
         // Create multiple animals
-        let animals = [];
-        for (let i = 0; i < 5; i++) {
-            animals.push(new Animal(Math.random() * 20 - 10, Math.random() * 20 - 10));
-        }
+        for (let i = 0; i < 20; i++) { // more animals for bigger map
+    	let x = Math.random() * 500 - 250;
+    	let z = Math.random() * 500 - 250;
+    	animals.push(new Animal(x, z));
+		}
 
         // Create the player (cube)
         let playerGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -125,17 +126,42 @@ kill() {
         let playerModel = new THREE.Mesh(playerGeometry, playerMaterial);
         scene.add(playerModel);
 
-	// Create ground with simple terrain
-	let groundGeometry = new THREE.PlaneGeometry(200, 200, 50, 50); // bigger map with subdivisions
-
+	// Create bigger ground
+	let groundGeometry = new THREE.PlaneGeometry(500, 500, 100, 100);
 	let groundMaterial = new THREE.MeshBasicMaterial({ color: 0x228B22, wireframe: false });
 	let ground = new THREE.Mesh(groundGeometry, groundMaterial);
-	ground.rotation.x = -Math.PI / 2; // Rotate plane to be horizontal
+	ground.rotation.x = -Math.PI / 2; // horizontal
 	scene.add(ground);
+	let trees = [];
+const treeCount = 50; // number of trees
+
+for (let i = 0; i < treeCount; i++) {
+    // Random X and Z on the map
+    let x = Math.random() * 500 - 250; 
+    let z = Math.random() * 500 - 250;
+
+    // Tree trunk
+    let trunkGeometry = new THREE.CylinderGeometry(0.5, 0.5, 5, 8);
+    let trunkMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 }); // brown
+    let trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+    trunk.position.set(x, 2.5, z); // 2.5 because height/2
+    scene.add(trunk);
+
+    // Tree leaves
+    let leavesGeometry = new THREE.ConeGeometry(2, 5, 8);
+    let leavesMaterial = new THREE.MeshBasicMaterial({ color: 0x006400 }); // dark green
+    let leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
+    leaves.position.set(x, 5 + 2.5, z); // trunk height + cone height / 2
+    scene.add(leaves);
+
+    // Store in array (optional, useful if you want to remove trees later)
+    trees.push({ trunk, leaves });
+}
+		
 		
 
         // Camera settings
-        let cameraOffset = new THREE.Vector3(0, 2, -5); // Camera offset behind the player
+        let cameraOffset = new THREE.Vector3(0, 5, -10); // Camera offset behind the player
         camera.position.set(cameraOffset.x, cameraOffset.y, cameraOffset.z);
         camera.lookAt(playerModel.position);
 
@@ -290,6 +316,7 @@ function updateUI(message = "") {
     </script>
 </body>
 </html>
+
 
 
 
