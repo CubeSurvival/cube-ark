@@ -24,10 +24,11 @@
         <p>Food: <span id="food">0</span></p>
         <p>Press 'K' to Kill Animal (Simulation)</p>
         <p>Press 'C' to Cook Food</p>
-	<p id="message"></p>
+	
 		<p>Wood: <span id="wood">0</span></p>
 		<p>Stone: <span id="stone">0</span></p>
 		<p>Press 'E' to Open Craft Menu</p>
+		<p id="message"></p>
 		
 		<div id="craftMenu" style="display:none; background:black; padding:10px; margin-top:10px;">
 	    <p>--- Crafting ---</p>
@@ -195,6 +196,7 @@ kill() {
 		    scene.add(rock);
 		    rocks.push(rock);
 }
+		let campfires = [];
 		function craftItem(key) {
 	    // Campfire
 	    if (key === "1") {
@@ -220,12 +222,17 @@ kill() {
 	    }
 	}
 		function spawnCampfire() {
-	    let geo = new THREE.ConeGeometry(1, 2, 8);
-	    let mat = new THREE.MeshBasicMaterial({ color: 0xff4500 });
-	    let fire = new THREE.Mesh(geo, mat);
-	    fire.position.copy(playerModel.position);
-	    scene.add(fire);
-	}
+    let geo = new THREE.ConeGeometry(1, 2, 8);
+    let mat = new THREE.MeshBasicMaterial({ color: 0xff4500 });
+    let fire = new THREE.Mesh(geo, mat);
+
+    fire.position.copy(playerModel.position);
+    fire.position.y = 1; // lift slightly
+
+    scene.add(fire);
+
+    campfires.push(fire); // store it
+}
 		function spawnCraftTable() {
 	    let geo = new THREE.BoxGeometry(2, 1.5, 2);
 	    let mat = new THREE.MeshBasicMaterial({ color: 0x654321 });
@@ -234,6 +241,15 @@ kill() {
 	    table.position.y = 0.75;
 	    scene.add(table);
 	}
+		function isNearCampfire() {
+    for (let fire of campfires) {
+        let distance = playerModel.position.distanceTo(fire.position);
+        if (distance < 3) { // range to cook
+            return true;
+        }
+    }
+    return false;
+}
 
         // Camera settings
         let cameraOffset = new THREE.Vector3(0, 2, -5); // Camera offset behind the player
@@ -300,14 +316,23 @@ kill() {
 
         // Cooking (press 'C' to simulate cooking)
         function cookFood() {
-            if (player.food > 0 && player.hunger < 100) {
-                player.food -= 1;
-                player.hunger += 20; // Cooking restores hunger
-                if (player.hunger > 100) player.hunger = 100;
-                updateUI();
-                updateUI("You cooked food.");
-            }
-        }
+
+    if (!isNearCampfire()) {
+        updateUI("You need to be near a campfire!");
+        return;
+    }
+
+    if (player.food > 0 && player.hunger < 100) {
+        player.food -= 1;
+        player.hunger += 20;
+
+        if (player.hunger > 100) player.hunger = 100;
+
+        updateUI("You cooked food at the campfire!");
+    } else {
+        updateUI("Nothing to cook!");
+    }
+}
 
         // Update the UI display for health, hunger, and food
 		const messageElement = document.getElementById("message");
@@ -384,6 +409,7 @@ for (let i = rocks.length - 1; i >= 0; i--) {
         updateUI("Picked up a rock!");
     }
 }
+	
 
     // Update camera position to follow the player smoothly
     updateCamera();
@@ -429,6 +455,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
