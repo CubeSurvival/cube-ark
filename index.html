@@ -78,17 +78,24 @@
                 }
             }
 
-            kill() {
+kill() {
     if (this.alive) {
         this.alive = false;
         this.model.material.color.set(0xff0000); // Turn red
 
+        // Drop a meat cube at the animal's position
+        const meatGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        const meatMaterial = new THREE.MeshBasicMaterial({ color: 0xffa500 }); // orange meat
+        const meat = new THREE.Mesh(meatGeometry, meatMaterial);
+        meat.position.copy(this.model.position);
+        scene.add(meat);
+
         // Remove the animal from the scene after 1 second
         setTimeout(() => {
-            scene.remove(this.model);  // Remove the mesh
-            this.model.geometry.dispose(); // Free geometry memory
-            this.model.material.dispose(); // Free material memory
-        }, 1000); // 1000 ms = 1 second
+            scene.remove(this.model);
+            this.model.geometry.dispose();
+            this.model.material.dispose();
+        }, 1000);
 
         return true;
     }
@@ -268,6 +275,7 @@ function updateUI(message = "") {
     </script>
 </body>
 </html>
+
 
 
 
