@@ -79,13 +79,21 @@
             }
 
             kill() {
-                if (this.alive) {
-                    this.alive = false;
-                    this.model.material.color.set(0xff0000); // Turn the animal red when killed
-                    return true;
-                }
-                return false;
-            }
+    if (this.alive) {
+        this.alive = false;
+        this.model.material.color.set(0xff0000); // Turn red
+
+        // Remove the animal from the scene after 1 second
+        setTimeout(() => {
+            scene.remove(this.model);  // Remove the mesh
+            this.model.geometry.dispose(); // Free geometry memory
+            this.model.material.dispose(); // Free material memory
+        }, 1000); // 1000 ms = 1 second
+
+        return true;
+    }
+    return false;
+}
 
             dropMeat() {
                 if (!this.alive) {
@@ -260,5 +268,6 @@ function updateUI(message = "") {
     </script>
 </body>
 </html>
+
 
 
