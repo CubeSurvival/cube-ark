@@ -389,16 +389,23 @@ for (let i = 0; i < bigRockCount; i++) {
 
         // Camera follows behind the player (ARK-like)
         function updateCamera() {
-            // Calculate the camera's target position behind the player
-            let targetPosition = playerModel.position.clone().add(cameraOffset);
+    // Rotate the offset according to player rotation
+    let rotatedOffset = cameraOffset.clone();
+    let angle = playerModel.rotation.y;
+    let cos = Math.cos(angle);
+    let sin = Math.sin(angle);
 
-            // Smoothly interpolate the camera's position to the target position
-            camera.position.lerp(targetPosition, 0.1);
+    let x = rotatedOffset.x * cos - rotatedOffset.z * sin;
+    let z = rotatedOffset.x * sin + rotatedOffset.z * cos;
+    rotatedOffset.x = x;
+    rotatedOffset.z = z;
 
-            // Camera looks at the player
-            camera.lookAt(playerModel.position);
-        }
+    // Target position
+    let targetPosition = playerModel.position.clone().add(rotatedOffset);
 
+    camera.position.lerp(targetPosition, 0.1);
+    camera.lookAt(playerModel.position);
+}
         // Check for animal killing (press 'K' to kill nearby animals)
         function killAnimal() {
             for (let animal of animals) {
@@ -713,6 +720,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
