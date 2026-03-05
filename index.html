@@ -56,6 +56,21 @@
 	<p>4 = sword (3 Wood, 1 Stone)</p>
 </div>
     </div>
+	<div id="deathMenu" style="
+display:none;
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:black;
+color:white;
+padding:30px;
+text-align:center;
+font-family:Arial;
+">
+    <h1>You Died</h1>
+    <button onclick="restartGame()">Restart</button>
+</div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // Set up the basic Three.js scene
@@ -611,6 +626,18 @@ function updateUI(message = "") {
         }, 3000);
     }
 }
+		let gameOver = false;
+
+function showDeathMenu() {
+    if (gameOver) return;
+    gameOver = true;
+
+    document.getElementById("deathMenu").style.display = "block";
+}
+
+function restartGame() {
+    location.reload();
+}
         // Animate the scene
 function animate() {
     requestAnimationFrame(animate);
@@ -686,6 +713,10 @@ for (let i = rocks.length - 1; i >= 0; i--) {
         updateUI("Picked up a rock!");
     }
 }
+	if (player.health <= 0) {
+    showDeathMenu();
+    return;
+}
 	
 
     // Update camera position to follow the player smoothly
@@ -750,6 +781,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
