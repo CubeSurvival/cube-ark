@@ -58,8 +58,10 @@
             direction: new THREE.Vector3(0, 0, 0), // Direction the player is facing
         };
 		let meatDrops = [];
-		let hungerDrainRate = 0.01;   // how fast hunger goes down
-		let healthDrainRate = 0.02;   // how fast health drops when starving
+		let lastHungerTick = 0;
+		let hungerInterval = 2000; // 2 seconds per hunger loss
+		let lastHealthTick = 0;
+		let healthInterval = 1000; // 1 second per health loss when starving
         // UI elements
         const healthElement = document.getElementById("health");
         const hungerElement = document.getElementById("hunger");
@@ -369,16 +371,22 @@ function animate() {
     movePlayer();
 	// ---- Survival System ----
 
-// Hunger slowly decreases
-if (player.hunger > 0) {
-    player.hunger -= hungerDrainRate;
-    if (player.hunger < 0) player.hunger = 0;
+let now = Date.now();
+
+// Hunger decreases every 2 seconds
+if (now - lastHungerTick > hungerInterval) {
+    if (player.hunger > 0) {
+        player.hunger -= 1;
+    }
+    lastHungerTick = now;
 }
 
-// If hunger is 0, lose health
-if (player.hunger === 0) {
-    player.health -= healthDrainRate;
-    if (player.health < 0) player.health = 0;
+// If hunger is 0, lose health every 1 second
+if (player.hunger === 0 && now - lastHealthTick > healthInterval) {
+    if (player.health > 0) {
+        player.health -= 1;
+    }
+    lastHealthTick = now;
 }
 	// Check if player is near any meat
 	for (let i = meatDrops.length - 1; i >= 0; i--) {
@@ -468,6 +476,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
