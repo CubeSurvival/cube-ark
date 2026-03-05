@@ -28,6 +28,7 @@
 		<p>Wood: <span id="wood">0</span></p>
 		<p>Stone: <span id="stone">0</span></p>
 		<p>Press 'E' to Open Craft Menu</p>
+		
 		<p id="message"></p>
 		
 		<div id="craftMenu" style="display:none; background:black; padding:10px; margin-top:10px;">
@@ -651,8 +652,6 @@ for (let i = rocks.length - 1; i >= 0; i--) {
 	
 
     // Update camera position to follow the player smoothly
-    if (messageTimeout) clearTimeout(messageTimeout);
-	messageElement.textContent = message;
     renderer.render(scene, camera);
 	updateCamera()
 }
@@ -714,6 +713,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
