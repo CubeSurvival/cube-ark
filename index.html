@@ -683,12 +683,6 @@ if (player.hunger === 0 && now - lastHealthTick > healthInterval) {
 	        player.food += foodAmount;
 	
 	        updateUI(`You picked up ${foodAmount} food!`);
-			
-			if (player.health <= 0) {
-    showDeathMenu();
-    return;
-}
-	
 	        // Remove the meat block
 	        scene.remove(meat);
 	        meat.geometry.dispose();
@@ -719,8 +713,14 @@ for (let i = rocks.length - 1; i >= 0; i--) {
         updateUI("Picked up a rock!");
     }
 }
-	
+// Update UI
+updateUI();
 
+// Check for death
+if (player.health <= 0) {
+    showDeathMenu();
+    return;
+}
     // Update camera position to follow the player smoothly
     renderer.render(scene, camera);
 	updateCamera()
@@ -783,6 +783,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
