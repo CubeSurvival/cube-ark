@@ -52,18 +52,19 @@
 
         // Player stats
         let player = {
-            health: 100,
-            hunger: 100,
-			wood: 0,
-    		stone: 0,
-            food: 0,
-			hasAxe: false,
-			hasPickaxe: false,
-			player.hasSword = false;
-            speed: 0.1, // Player movement speed
-            rotationSpeed: 0.05, // Rotation speed for the player
-            velocity: new THREE.Vector3(0, 0, 0), // Movement velocity
-            direction: new THREE.Vector3(0, 0, 0), // Direction the player is facing
+		    health: 100,
+		    hunger: 100,
+		    wood: 0,
+		    stone: 0,
+		    food: 0,
+		    hasAxe: false,
+		    hasPickaxe: false,
+		    hasSword: false, // ✅ Correct way
+		    speed: 0.1,
+		    rotationSpeed: 0.05,
+		    velocity: new THREE.Vector3(0, 0, 0),
+		    direction: new THREE.Vector3(0, 0, 0),
+		};
         };
 		let meatDrops = [];
 		let craftingTables = [];
@@ -715,6 +716,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
