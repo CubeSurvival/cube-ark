@@ -34,6 +34,11 @@
 	    <p>--- Crafting ---</p>
 	    <p>1 = Campfire (3 Wood, 2 Stone)</p>
 	    <p>2 = Crafting Table (5 Wood)</p>
+		<div id="tableMenu" style="display:none; background:darkblue; padding:10px; margin-top:10px;">
+    <p>--- Crafting Table ---</p>
+    <p>3 = Axe (3 Wood, 2 Stone)</p>
+    <p>4 = Pickaxe (2 Wood, 3 Stone)</p>
+		</div>
 </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -52,12 +57,15 @@
 			wood: 0,
     		stone: 0,
             food: 0,
+			hasAxe: false,
+			hasPickaxe: false,
             speed: 0.1, // Player movement speed
             rotationSpeed: 0.05, // Rotation speed for the player
             velocity: new THREE.Vector3(0, 0, 0), // Movement velocity
             direction: new THREE.Vector3(0, 0, 0), // Direction the player is facing
         };
 		let meatDrops = [];
+		let craftingTables = [];
 		let lastHungerTick = 0;
 		let hungerInterval = 2000; // 2 seconds per hunger loss
 		let lastHealthTick = 0;
@@ -69,6 +77,7 @@
 		const woodElement = document.getElementById("wood");
 		const stoneElement = document.getElementById("stone");
 		const craftMenu = document.getElementById("craftMenu");
+		const tableMenu = document.getElementById("tableMenu");
 
         // Animal class for easy manipulation of animals
         class Animal {
@@ -237,17 +246,28 @@ kill() {
     campfires.push(fire); // store it
 }
 		function spawnCraftTable() {
-	    let geo = new THREE.BoxGeometry(2, 1.5, 2);
-	    let mat = new THREE.MeshBasicMaterial({ color: 0x654321 });
-	    let table = new THREE.Mesh(geo, mat);
-	    table.position.copy(playerModel.position);
-	    table.position.y = 0.75;
-	    scene.add(table);
-	}
+    let geo = new THREE.BoxGeometry(2, 1.5, 2);
+    let mat = new THREE.MeshBasicMaterial({ color: 0x654321 });
+    let table = new THREE.Mesh(geo, mat);
+
+    table.position.copy(playerModel.position);
+    table.position.y = 0.75;
+
+    scene.add(table);
+    craftingTables.push(table);
+}
 		function isNearCampfire() {
     for (let fire of campfires) {
         let distance = playerModel.position.distanceTo(fire.position);
         if (distance < 3) { // range to cook
+            return true;
+        }
+    }
+    return false;
+}
+		function isNearCraftingTable() {
+    for (let table of craftingTables) {
+        if (playerModel.position.distanceTo(table.position) < 3) {
             return true;
         }
     }
@@ -316,6 +336,37 @@ kill() {
                 }
             }
         }
+		function chopTree() {
+
+    if (!player.hasAxe) {
+        updateUI("You need an axe!");
+        return;
+    }
+
+    for (let i = trees.length - 1; i >= 0; i--) {
+        let tree = trees[i];
+
+        if (playerModel.position.distanceTo(tree.trunk.position) < 3) {
+
+            // Give 3-6 wood
+            let woodGain = Math.floor(Math.random() * 4) + 3;
+            player.wood += woodGain;
+
+            scene.remove(tree.trunk);
+            scene.remove(tree.leaves);
+
+            tree.trunk.geometry.dispose();
+            tree.trunk.material.dispose();
+            tree.leaves.geometry.dispose();
+            tree.leaves.material.dispose();
+
+            trees.splice(i, 1);
+
+            updateUI(`Chopped tree! +${woodGain} wood`);
+            return;
+        }
+    }
+}
 
         // Cooking (press 'C' to simulate cooking)
         function cookFood() {
@@ -334,6 +385,32 @@ kill() {
         updateUI("You cooked food at the campfire!");
     } else {
         updateUI("Nothing to cook!");
+    }
+}
+		function craftTableItem(key) {
+
+    // Axe
+    if (key === "3") {
+        if (player.wood >= 3 && player.stone >= 2) {
+            player.wood -= 3;
+            player.stone -= 2;
+            player.hasAxe = true;
+            updateUI("Crafted Axe!");
+        } else {
+            updateUI("Not enough materials!");
+        }
+    }
+
+    // Pickaxe
+    if (key === "4") {
+        if (player.wood >= 2 && player.stone >= 3) {
+            player.wood -= 2;
+            player.stone -= 3;
+            player.hasPickaxe = true;
+            updateUI("Crafted Pickaxe!");
+        } else {
+            updateUI("Not enough materials!");
+        }
     }
 }
 
@@ -466,16 +543,31 @@ window.addEventListener("keydown", (event) => {
         craftMenu.style.display =
             craftMenu.style.display === "none" ? "block" : "none";
     }
+	if (tableMenu.style.display === "block") {
+    craftTableItem(event.key);
+}
+	if (event.key === "f") {
+    chopTree();
+}
 
     // Crafting (only works if menu is open)
     if (craftMenu.style.display === "block") {
         craftItem(event.key);
     }
+	if (event.key === "r") {
+    if (isNearCraftingTable()) {
+        tableMenu.style.display =
+            tableMenu.style.display === "none" ? "block" : "none";
+    } else {
+        updateUI("You must be near a crafting table!");
+    }
+}
 
 });
     </script>
 </body>
 </html>
+
 
 
 
