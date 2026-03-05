@@ -661,6 +661,7 @@ for (let i = rocks.length - 1; i >= 0; i--) {
     if (messageTimeout) clearTimeout(messageTimeout);
 	messageElement.textContent = message;
     renderer.render(scene, camera);
+	updateCamera();
 }
 
         animate();
@@ -720,6 +721,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
