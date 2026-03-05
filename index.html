@@ -62,15 +62,16 @@ position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-background:black;
+background:rgba(0,0,0,0.9);
 color:white;
-padding:30px;
+padding:40px;
 text-align:center;
 font-family:Arial;
-z-index:1000;
+font-size:30px;
+z-index:2000;
 ">
 <h1>You Died</h1>
-<button onclick="restartGame()">Restart</button>
+<button onclick="restartGame()" style="font-size:20px;">Restart</button>
 </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
@@ -642,6 +643,10 @@ function restartGame() {
         // Animate the scene
 function animate() {
     requestAnimationFrame(animate);
+	if (gameOver) {
+    renderer.render(scene, camera);
+    return;
+}
 
     // Update animal movements
     for (let animal of animals) {
@@ -719,7 +724,6 @@ updateUI();
 // Check for death
 if (player.health <= 0) {
     showDeathMenu();
-    return;
 }
     // Update camera position to follow the player smoothly
     renderer.render(scene, camera);
@@ -783,6 +787,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
