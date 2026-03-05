@@ -39,6 +39,7 @@
     <p>--- Crafting Table ---</p>
     <p>3 = Axe (3 Wood, 2 Stone)</p>
     <p>4 = Pickaxe (2 Wood, 3 Stone)</p>
+	<p>4 = sword (3 Wood, 1 Stone)</p>
 		</div>
 </div>
     </div>
@@ -83,30 +84,53 @@
 
         // Animal class for easy manipulation of animals
         class Animal {
-            constructor(x, z) {
-                this.geometry = new THREE.BoxGeometry(1, 1, 1);
-                this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-                this.model = new THREE.Mesh(this.geometry, this.material);
-                this.model.position.set(x, 0.5, z);
-                scene.add(this.model);
+    constructor(x, z) {
+        this.geometry = new THREE.BoxGeometry(1, 1, 1);
+        this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        this.model = new THREE.Mesh(this.geometry, this.material);
+        this.model.position.set(x, 0.5, z);
+        scene.add(this.model);
 
-                // Animal movement properties
-                this.speed = 0.02;
+        this.speed = 0.02;
+        this.direction = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
+        this.alive = true;
+    }
+
+    move() {
+        if (this.alive) {
+            this.model.position.addScaledVector(this.direction, this.speed);
+
+            if (Math.abs(this.model.position.x) > 250 || Math.abs(this.model.position.z) > 250) {
                 this.direction = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
-                this.alive = true;
             }
+        }
+    }
 
-            move() {
-                if (this.alive) {
-                    // Random movement within a small range
-                    this.model.position.addScaledVector(this.direction, this.speed);
+    kill() {
+        if (this.alive) {
+            this.alive = false;
+            this.model.material.color.set(0xff0000); // turn red
 
-                    // If the animal reaches the edge of a predefined area, change direction
-                    if (Math.abs(this.model.position.x) > 250 || Math.abs(this.model.position.z) > 250) {
-				    this.direction = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
-					}
-                }
-            }
+            // Drop meat
+            const meatGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+            const meatMaterial = new THREE.MeshBasicMaterial({ color: 0xffa500 });
+            const meat = new THREE.Mesh(meatGeometry, meatMaterial);
+
+            meat.position.copy(this.model.position);
+            scene.add(meat);
+            meatDrops.push(meat);
+
+            setTimeout(() => {
+                scene.remove(this.model);
+                this.model.geometry.dispose();
+                this.model.material.dispose();
+            }, 1000);
+
+            return true;
+        }
+
+        return false;
+    }
 }
 let enemies = [];
 		class Enemy {
@@ -713,6 +737,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
