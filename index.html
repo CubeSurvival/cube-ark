@@ -205,6 +205,62 @@ for (let i = 0; i < bigRockCount; i++) {
 
     bigRocks.push(rock);
 }
+		let enemies = [];
+
+class Enemy {
+    constructor(x, z) {
+        this.geometry = new THREE.BoxGeometry(1, 1, 1);
+        this.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        this.model = new THREE.Mesh(this.geometry, this.material);
+        this.model.position.set(x, 0.5, z);
+        scene.add(this.model);
+
+        this.speed = 0.05;
+        this.health = 2; // takes 2 hits to kill
+        this.alive = true;
+    }
+
+    moveTowardsPlayer() {
+        if (!this.alive) return;
+
+        let direction = playerModel.position.clone().sub(this.model.position).normalize();
+        this.model.position.addScaledVector(direction, this.speed);
+
+        // Attack if close
+        let distance = this.model.position.distanceTo(playerModel.position);
+        if (distance < 1.5) {
+            this.attackPlayer();
+        }
+    }
+
+    attackPlayer() {
+        // 1 attack per second max
+        if (!this.lastAttackTime || Date.now() - this.lastAttackTime > 1000) {
+            player.health -= 5;
+            if (player.health < 0) player.health = 0;
+            updateUI("Enemy hit you! -5 health");
+            this.lastAttackTime = Date.now();
+        }
+    }
+
+    takeHit() {
+        if (!this.alive) return;
+
+        this.health -= 1;
+        if (this.health <= 0) {
+            this.alive = false;
+            scene.remove(this.model);
+            this.model.geometry.dispose();
+            this.model.material.dispose();
+            updateUI("Enemy killed!");
+        } else {
+            // Knockback
+            let knockbackDir = this.model.position.clone().sub(playerModel.position).normalize();
+            this.model.position.addScaledVector(knockbackDir, 2);
+            updateUI("Enemy hit! Knocked back!");
+        }
+    }
+}
 		let sticks = [];
 		let rocks = [];
 		
@@ -355,6 +411,18 @@ for (let i = 0; i < bigRockCount; i++) {
                 }
             }
         }
+		function attackEnemies() {
+    if (!player.hasSword) {
+        updateUI("You need a sword to attack!");
+        return;
+    }
+
+    for (let enemy of enemies) {
+        if (enemy.alive && playerModel.position.distanceTo(enemy.model.position) < 2) {
+            enemy.takeHit();
+        }
+    }
+}
 		function chopTree() {
 
     if (!player.hasAxe) {
@@ -413,6 +481,19 @@ for (let i = 0; i < bigRockCount; i++) {
         }
     }
 }
+		function spawnEnemies(count = 5) {
+    for (let i = 0; i < count; i++) {
+        let x = Math.random() * 500 - 250;
+        let z = Math.random() * 500 - 250;
+        enemies.push(new Enemy(x, z));
+    }
+}
+
+// Night cycle (every 60s for now)
+setInterval(() => {
+    spawnEnemies(5);
+    updateUI("Night has come! Enemies spawned!");
+}, 60000); // 60 seconds
 
         // Cooking (press 'C' to simulate cooking)
         function cookFood() {
@@ -460,6 +541,19 @@ for (let i = 0; i < bigRockCount; i++) {
     }
 }
 
+    // Sword (requires 3 wood + 1 stone)
+    if (key === "5") {
+        if (player.wood >= 3 && player.stone >= 1) {
+            player.wood -= 3;
+            player.stone -= 1;
+            player.hasSword = true;
+            updateUI("Crafted Sword! Press 'H' to attack enemies");
+        } else {
+            updateUI("Not enough materials for Sword!");
+        }
+    }
+}
+
         // Update the UI display for health, hunger, and food
 		const messageElement = document.getElementById("message");
 let messageTimeout;
@@ -489,6 +583,9 @@ function animate() {
     for (let animal of animals) {
         animal.move();
     }
+	for (let enemy of enemies) {
+    if (enemy.alive) enemy.moveTowardsPlayer();
+}
 
     // Update player movement
     movePlayer();
@@ -598,7 +695,11 @@ window.addEventListener("keydown", (event) => {
 	if (event.key === "g") {
     mineRock();
 }
-
+	window.addEventListener("keydown", (event) => {
+    if (event.key === "h") {
+        attackEnemies();
+    }
+});
     // Crafting (only works if menu is open)
     if (craftMenu.style.display === "block") {
         craftItem(event.key);
@@ -616,6 +717,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
