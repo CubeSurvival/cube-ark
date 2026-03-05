@@ -643,10 +643,8 @@ function restartGame() {
         // Animate the scene
 function animate() {
     requestAnimationFrame(animate);
-	if (gameOver) {
-    renderer.render(scene, camera);
-    return;
-}
+	if (gameOver) return;
+
 
     // Update animal movements
     for (let animal of animals) {
@@ -722,8 +720,11 @@ for (let i = rocks.length - 1; i >= 0; i--) {
 updateUI();
 
 // Check for death
+// Check for death
 if (player.health <= 0) {
     showDeathMenu();
+    gameOver = true;
+    return;
 }
     // Update camera position to follow the player smoothly
     renderer.render(scene, camera);
@@ -787,6 +788,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
