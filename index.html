@@ -105,6 +105,62 @@
 					}
                 }
             }
+			let enemies = [];
+
+class Enemy {
+    constructor(x, z) {
+        this.geometry = new THREE.BoxGeometry(1, 1, 1);
+        this.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        this.model = new THREE.Mesh(this.geometry, this.material);
+        this.model.position.set(x, 0.5, z);
+        scene.add(this.model);
+
+        this.speed = 0.05;
+        this.health = 2; // takes 2 hits to kill
+        this.alive = true;
+    }
+
+    moveTowardsPlayer() {
+        if (!this.alive) return;
+
+        let direction = playerModel.position.clone().sub(this.model.position).normalize();
+        this.model.position.addScaledVector(direction, this.speed);
+
+        // Attack if close
+        let distance = this.model.position.distanceTo(playerModel.position);
+        if (distance < 1.5) {
+            this.attackPlayer();
+        }
+    }
+
+    attackPlayer() {
+        // 1 attack per second max
+        if (!this.lastAttackTime || Date.now() - this.lastAttackTime > 1000) {
+            player.health -= 5;
+            if (player.health < 0) player.health = 0;
+            updateUI("Enemy hit you! -5 health");
+            this.lastAttackTime = Date.now();
+        }
+    }
+
+    takeHit() {
+        if (!this.alive) return;
+
+        this.health -= 1;
+        if (this.health <= 0) {
+            this.alive = false;
+            scene.remove(this.model);
+            this.model.geometry.dispose();
+            this.model.material.dispose();
+            updateUI("Enemy killed!");
+        } else {
+            // Knockback
+            let knockbackDir = this.model.position.clone().sub(playerModel.position).normalize();
+            this.model.position.addScaledVector(knockbackDir, 2);
+            updateUI("Enemy hit! Knocked back!");
+        }
+    }
+}
 
 kill() {
     if (this.alive) {
@@ -204,62 +260,6 @@ for (let i = 0; i < bigRockCount; i++) {
     scene.add(rock);
 
     bigRocks.push(rock);
-}
-		let enemies = [];
-
-class Enemy {
-    constructor(x, z) {
-        this.geometry = new THREE.BoxGeometry(1, 1, 1);
-        this.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        this.model = new THREE.Mesh(this.geometry, this.material);
-        this.model.position.set(x, 0.5, z);
-        scene.add(this.model);
-
-        this.speed = 0.05;
-        this.health = 2; // takes 2 hits to kill
-        this.alive = true;
-    }
-
-    moveTowardsPlayer() {
-        if (!this.alive) return;
-
-        let direction = playerModel.position.clone().sub(this.model.position).normalize();
-        this.model.position.addScaledVector(direction, this.speed);
-
-        // Attack if close
-        let distance = this.model.position.distanceTo(playerModel.position);
-        if (distance < 1.5) {
-            this.attackPlayer();
-        }
-    }
-
-    attackPlayer() {
-        // 1 attack per second max
-        if (!this.lastAttackTime || Date.now() - this.lastAttackTime > 1000) {
-            player.health -= 5;
-            if (player.health < 0) player.health = 0;
-            updateUI("Enemy hit you! -5 health");
-            this.lastAttackTime = Date.now();
-        }
-    }
-
-    takeHit() {
-        if (!this.alive) return;
-
-        this.health -= 1;
-        if (this.health <= 0) {
-            this.alive = false;
-            scene.remove(this.model);
-            this.model.geometry.dispose();
-            this.model.material.dispose();
-            updateUI("Enemy killed!");
-        } else {
-            // Knockback
-            let knockbackDir = this.model.position.clone().sub(playerModel.position).normalize();
-            this.model.position.addScaledVector(knockbackDir, 2);
-            updateUI("Enemy hit! Knocked back!");
-        }
-    }
 }
 		let sticks = [];
 		let rocks = [];
@@ -715,6 +715,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
