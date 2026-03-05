@@ -77,6 +77,19 @@ z-index:2000;
     <script>
         // Set up the basic Three.js scene
         let scene = new THREE.Scene();
+		// Sun light
+let sunLight = new THREE.DirectionalLight(0xffffff, 1);
+sunLight.position.set(0, 50, 0);
+scene.add(sunLight);
+
+// Ambient light for soft lighting
+let ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+// Track day-night cycle
+let dayTime = 0; // 0 to 1, 0 = midnight, 0.5 = noon
+let daySpeed = 0.0001; // how fast time progresses
+let isNight = false;
         let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         let renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -726,6 +739,37 @@ if (player.health <= 0) {
     gameOver = true;
     return;
 }
+	// ---- Day/Night Cycle ----
+dayTime += daySpeed;
+if (dayTime > 1) dayTime = 0;
+
+// Calculate sun angle (0 = midnight, π = noon)
+let sunAngle = dayTime * Math.PI * 2;
+sunLight.position.set(Math.sin(sunAngle) * 50, Math.cos(sunAngle) * 50, 0);
+sunLight.lookAt(0, 0, 0);
+
+// Adjust light intensity and ambient based on sun height
+sunLight.intensity = Math.max(0, Math.cos(sunAngle));
+ambientLight.intensity = 0.3 + 0.5 * Math.max(0, Math.cos(sunAngle));
+
+// Change background color for day/night
+if (sunLight.intensity > 0.2) {
+    scene.background = new THREE.Color(0x87ceeb); // day sky blue
+} else {
+    scene.background = new THREE.Color(0x000022); // night dark blue
+}
+
+// Night enemies spawn
+if (!isNight && sunLight.intensity < 0.2) {
+    spawnEnemies(5);
+    updateUI("Night has come! Enemies spawned!");
+    isNight = true;
+}
+
+if (isNight && sunLight.intensity > 0.3) {
+    updateUI("Day has come! It's safe now.");
+    isNight = false;
+}
     // Update camera position to follow the player smoothly
     renderer.render(scene, camera);
 	updateCamera()
@@ -788,6 +832,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
