@@ -163,6 +163,7 @@ kill() {
 		
 		let trees = [];
 		const treeCount = 240; // number of trees
+		
 
 		for (let i = 0; i < treeCount; i++) {
 	    // Random X and Z on the map
@@ -186,6 +187,24 @@ kill() {
 	    // Store in array (optional, useful if you want to remove trees later)
 	    trees.push({ trunk, leaves });
 	}
+		let bigRocks = [];
+		const bigRockCount = 240;
+
+for (let i = 0; i < bigRockCount; i++) {
+
+    let x = Math.random() * 500 - 250;
+    let z = Math.random() * 500 - 250;
+
+    // Rock base
+    let rockGeometry = new THREE.DodecahedronGeometry(3);
+    let rockMaterial = new THREE.MeshBasicMaterial({ color: 0x555555 });
+    let rock = new THREE.Mesh(rockGeometry, rockMaterial);
+
+    rock.position.set(x, 3, z); // half height
+    scene.add(rock);
+
+    bigRocks.push(rock);
+}
 		let sticks = [];
 		let rocks = [];
 		
@@ -363,6 +382,33 @@ kill() {
             trees.splice(i, 1);
 
             updateUI(`Chopped tree! +${woodGain} wood`);
+            return;
+        }
+    }
+}
+		function mineRock() {
+
+    if (!player.hasPickaxe) {
+        updateUI("You need a pickaxe!");
+        return;
+    }
+
+    for (let i = bigRocks.length - 1; i >= 0; i--) {
+
+        let rock = bigRocks[i];
+
+        if (playerModel.position.distanceTo(rock.position) < 4) {
+
+            let stoneGain = Math.floor(Math.random() * 4) + 3; // 3-6 stone
+            player.stone += stoneGain;
+
+            scene.remove(rock);
+            rock.geometry.dispose();
+            rock.material.dispose();
+
+            bigRocks.splice(i, 1);
+
+            updateUI(`Mined rock! +${stoneGain} stone`);
             return;
         }
     }
@@ -549,6 +595,9 @@ window.addEventListener("keydown", (event) => {
 	if (event.key === "f") {
     chopTree();
 }
+	if (event.key === "g") {
+    mineRock();
+}
 
     // Crafting (only works if menu is open)
     if (craftMenu.style.display === "block") {
@@ -567,6 +616,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
