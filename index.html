@@ -4,47 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Survival Game</title>
-    <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
-        #ui {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: white;
-            font-family: Arial, sans-serif;
-            font-size: 18px;
-        }
-		#craftMenu {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: black;
-    padding: 10px;
-    color: white;
+	<style>
+  /* -------------------
+     Base UI
+  ------------------- */
+  body { margin:0; overflow:hidden; font-family: Arial, sans-serif; background:#000; }
+  canvas { display:block; }
+
+  #ui {
+    position:absolute;
+    top:12px; left:12px;
+    color:white; z-index:10;
+    user-select:none;
+  }
+
+  #stats {
+    font-size:16px;
+    margin-bottom:8px;
+    background: rgba(0,0,0,0.6);
+    padding:6px 10px;
+    border-radius:6px;
+  }
+
+  #inventory {
+    background: rgba(0,0,0,0.6);
+    padding:8px;
+    border-radius:6px;
+    min-width:160px;
+    margin-bottom:6px;
+  }
+  #inventory h4 { margin:4px 0; font-size:14px; }
+  #inventory .item { display:flex; justify-content:space-between; font-size:14px; }
+
+  #controls {
+    margin-top:6px;
+    font-size:13px;
+    color:#ddd;
+    background: rgba(0,0,0,0.5);
+    padding:4px 6px;
+    border-radius:6px;
+  }
+
+  #toggleHint {
+    position:absolute; top:6px; right:12px;
+    color:#ccc; font-size:12px;
+  }
+
+  /* -------------------
+     Messages
+  ------------------- */
+  #messageBox {
+    position:absolute;
+    bottom:28px; left:50%;
+    transform:translateX(-50%) scale(1);
+    color:white;
+    font-size:18px;
+    background: rgba(0,0,0,0.7);
+    padding:10px 16px;
+    border-radius:10px;
+    z-index:11;
+    min-width:220px;
+    text-align:center;
+    opacity:0;
+    pointer-events:none;
+    transition: all 0.35s ease-out;
+  }
+
+  #messageBox.show {
+    opacity:1;
+    transform:translateX(-50%) scale(1.05);
+  }
+
+  #pickupMsg {
+    position:absolute; bottom:90px; left:50%;
+    transform:translateX(-50%) translateY(0);
+    color:lime;
+    font-weight:bold;
+    text-shadow:0 0 6px black;
+    z-index:11;
+    pointer-events:none;
+    opacity:0;
+    transition: all 0.8s ease-out;
+  }
+  #pickupMsg.show {
+    opacity:1;
+    transform:translateX(-50%) translateY(-30px);
+  }
+</style>
+
+<script>
+function showMessage(text,len=2000){
+  messageBox.textContent = text;
+  messageBox.classList.add('show');
+  if(len>0){
+    setTimeout(()=>{
+      messageBox.classList.remove('show');
+    }, len);
+  }
 }
 
-#tableMenu {
-    margin-top: 10px;
-    background: darkblue;
-    padding: 10px;
-}	
-    </style>
-</head>
-<body>
-    <div id="ui">
-        <p>Health: <span id="health">100</span></p>
-        <p>Hunger: <span id="hunger">100</span></p>
-        <p>Food: <span id="food">0</span></p>
-        <p>Press 'K' to Kill Animal (Simulation)</p>
-        <p>Press 'C' to Cook Food</p>
-	
-		<p>Wood: <span id="wood">0</span></p>
-		<p>Stone: <span id="stone">0</span></p>
-		<p>Press 'E' to Open Craft Menu</p>
-		
-		<p id="message"></p>
-		</div>
+function showPickup(text){
+  pickupMsg.textContent = text;
+  pickupMsg.classList.add('show');
+  setTimeout(()=>{
+    pickupMsg.classList.remove('show');
+    setTimeout(()=>{ pickupMsg.textContent=''; },350); // clear text after fade
+  },900);
+}
+</script>
 			<div id="craftMenu" style="display:none;">
 	    <p>--- Crafting ---</p>
 	    <p>1 = Campfire (3 Wood, 2 Stone)</p>
@@ -617,24 +684,6 @@ for (let i = 0; i < bigRockCount; i++) {
         // Update the UI display for health, hunger, and food
 		const messageElement = document.getElementById("message");
 let messageTimeout;
-
-function updateUI(message = "") {
-    healthElement.textContent = player.health;
-    hungerElement.textContent = player.hunger;
-    foodElement.textContent = player.food;
-    woodElement.textContent = player.wood;
-    stoneElement.textContent = player.stone;
-
-    if (messageTimeout) clearTimeout(messageTimeout);
-
-    messageElement.textContent = message;
-
-    if (message !== "") {
-        messageTimeout = setTimeout(() => {
-            messageElement.textContent = "";
-        }, 3000);
-    }
-}
 		let gameOver = false;
 
 function showDeathMenu() {
@@ -826,6 +875,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
