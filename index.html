@@ -337,6 +337,17 @@ kill() {
 	    let z = Math.random() * 500 - 250;
 	    animals.push(new Animal(x, z));
 	}
+		function updateUI(message) {
+    // Update health, hunger, wood, stone, food
+    if (healthElement) healthElement.textContent = `Health: ${player.health}`;
+    if (hungerElement) hungerElement.textContent = `Hunger: ${player.hunger}`;
+    if (foodElement) foodElement.textContent = `Food: ${player.food}`;
+    if (woodElement) woodElement.textContent = `Wood: ${player.wood}`;
+    if (stoneElement) stoneElement.textContent = `Stone: ${player.stone}`;
+
+    // Show a message if one is provided
+    if (message) showMessage(message);
+}
 
         // Create the player (cube)
         let playerGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -875,6 +886,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
