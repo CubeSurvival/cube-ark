@@ -76,6 +76,10 @@ z-index:2000;
 </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
+		let cameraAngleY = 0; // horizontal angle around the player
+let cameraDistance = 5; // distance behind player
+let cameraHeight = 2;   // height above player
+let rotateSpeed = 0.03; // how fast the camera rotates
 		let daysSurvived = 0; // Counter for full days
 const daysElement = document.getElementById("days");
         // Set up the basic Three.js scene
@@ -421,9 +425,18 @@ for (let i = 0; i < bigRockCount; i++) {
 }
 
         // Camera settings
-        let cameraOffset = new THREE.Vector3(0, 2, -5); // Camera offset behind the player
-        camera.position.set(cameraOffset.x, cameraOffset.y, cameraOffset.z);
-        camera.lookAt(playerModel.position);
+        function updateCamera() {
+    let offsetX = Math.sin(cameraAngleY) * cameraDistance;
+    let offsetZ = Math.cos(cameraAngleY) * cameraDistance;
+
+    camera.position.set(
+        playerModel.position.x + offsetX,
+        playerModel.position.y + cameraHeight,
+        playerModel.position.z + offsetZ
+    );
+
+    camera.lookAt(playerModel.position);
+}
 
         // Simple camera movement for the player
         let keys = {};
@@ -783,6 +796,19 @@ if (isNight && sunLight.intensity > 0.3) {
     // Update camera position to follow the player smoothly
     renderer.render(scene, camera);
 	updateCamera()
+	// Camera rotation with arrow keys
+if (keys["ArrowLeft"]) cameraAngleY -= rotateSpeed;
+if (keys["ArrowRight"]) cameraAngleY += rotateSpeed;
+
+// Optional: rotate player to face camera direction
+if (keys["ArrowUp"]) playerModel.rotation.y = cameraAngleY;
+if (keys["ArrowDown"]) playerModel.rotation.y = cameraAngleY + Math.PI;
+
+// Update camera position around player
+let camX = playerModel.position.x + Math.sin(cameraAngleY) * cameraDistance;
+let camZ = playerModel.position.z + Math.cos(cameraAngleY) * cameraDistance;
+camera.position.set(camX, playerModel.position.y + cameraHeight, camZ);
+camera.lookAt(playerModel.position);
 }
 
         animate();
@@ -835,13 +861,28 @@ window.addEventListener("keydown", (event) => {
             tableMenu.style.display === "none" ? "block" : "none";
     } else {
         updateUI("You must be near a crafting table!");
-    }
+    }		
+}
+// Rotate camera with left/right arrows
+if (keys["ArrowLeft"]) {
+    cameraAngleY -= rotateSpeed;
+}
+if (keys["ArrowRight"]) {
+    cameraAngleY += rotateSpeed;
 }
 
+// Optional: rotate player with up/down arrows
+if (keys["ArrowUp"]) {
+    playerModel.rotation.y = cameraAngleY; // player faces forward
+}
+if (keys["ArrowDown"]) {
+    playerModel.rotation.y = cameraAngleY + Math.PI; // backward
+}
 });
     </script>
 </body>
 </html>
+
 
 
 
