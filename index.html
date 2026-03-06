@@ -119,6 +119,7 @@ let isNight = false;
 		let hungerInterval = 2000; // 2 seconds per hunger loss
 		let lastHealthTick = 0;
 		let healthInterval = 1000; // 1 second per health loss when starving
+		let lastDayUpdate = Date.now();
         // UI elements
         const healthElement = document.getElementById("health");
         const hungerElement = document.getElementById("hunger");
@@ -841,6 +842,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
