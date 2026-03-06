@@ -783,19 +783,22 @@ if (isNight && sunLight.intensity > 0.3) {
     updateUI("Day has come! It's safe now.");
     isNight = false;
 }
-    // Update camera position to follow the player smoothly
-    renderer.render(scene, camera);
-	updateCamera()
 	// Camera rotation with arrow keys
+// Camera rotation
 if (keys["ArrowLeft"]) cameraAngleY -= rotateSpeed;
 if (keys["ArrowRight"]) cameraAngleY += rotateSpeed;
-	
-updateCamera()
-// Optional: rotate player to face camera direction
+
+// Optional: rotate player
 if (keys["ArrowUp"]) playerModel.rotation.y = cameraAngleY;
 if (keys["ArrowDown"]) playerModel.rotation.y = cameraAngleY + Math.PI;
-	updateCamera()
 
+// Update camera
+updateCamera();
+
+// Render
+renderer.render(scene, camera);
+
+} 
         animate();
 
         // Resize the canvas when the window is resized
@@ -867,6 +870,7 @@ if (keys["ArrowDown"]) {
     </script>
 </body>
 </html>
+
 
 
 
