@@ -740,8 +740,8 @@ if (player.health <= 0) {
 let previousDayTime = dayTime; // store old time
 
 // New day/night system
-let now = Date.now();
-let elapsed = now - lastDayUpdate; // time passed since last frame
+now = Date.now();
+let elapsed = now - lastDayUpdate;
 
 let dayDuration = 60 * 1000; // 1 game day = 60 seconds (adjust as needed)
 dayTime += elapsed / dayDuration;
@@ -841,6 +841,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
