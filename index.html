@@ -739,14 +739,20 @@ if (player.health <= 0) {
 // ---- Day/Night Cycle ----
 let previousDayTime = dayTime; // store old time
 
-dayTime += daySpeed;
-if (dayTime > 1) {
+// New day/night system
+let now = Date.now();
+let elapsed = now - lastDayUpdate; // time passed since last frame
+
+let dayDuration = 60 * 1000; // 1 game day = 60 seconds (adjust as needed)
+dayTime += elapsed / dayDuration;
+
+if (dayTime >= 1) {
     dayTime = 0;
-    daysSurvived++;                 // Increment day counter
-    daysElement.textContent = daysSurvived; // Update UI
+    daysSurvived++;
+    daysElement.textContent = daysSurvived;
 }
-dayTime += daySpeed;
-if (dayTime > 1) dayTime = 0;
+
+lastDayUpdate = now; // reset for next frame
 
 let sunAngle = dayTime * Math.PI * 2;
 sunLight.position.set(Math.sin(sunAngle) * 50, Math.cos(sunAngle) * 50, 0);
@@ -835,6 +841,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
