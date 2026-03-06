@@ -284,6 +284,8 @@ kill() {
         let playerMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
         let playerModel = new THREE.Mesh(playerGeometry, playerMaterial);
         scene.add(playerModel);
+		camera.position.set(0, 3, 6);
+camera.lookAt(playerModel.position);
 
 			// Create ground with simple terrain
 		let groundGeometry = new THREE.PlaneGeometry(500, 500, 100, 100);
@@ -470,18 +472,6 @@ for (let i = 0; i < bigRockCount; i++) {
                 let angle = Math.atan2(direction.x, direction.z); // Calculate the angle to face
                 playerModel.rotation.y = angle; // Update the player's rotation to face the new direction
             }
-        }
-
-        // Camera follows behind the player (ARK-like)
-        function updateCamera() {
-            // Calculate the camera's target position behind the player
-            let targetPosition = playerModel.position.clone().add(cameraOffset);
-
-            // Smoothly interpolate the camera's position to the target position
-            camera.position.lerp(targetPosition, 0.1);
-
-            // Camera looks at the player
-            camera.lookAt(playerModel.position);
         }
 
         // Check for animal killing (press 'K' to kill nearby animals)
@@ -799,17 +789,12 @@ if (isNight && sunLight.intensity > 0.3) {
 	// Camera rotation with arrow keys
 if (keys["ArrowLeft"]) cameraAngleY -= rotateSpeed;
 if (keys["ArrowRight"]) cameraAngleY += rotateSpeed;
-
+	
+updateCamera()
 // Optional: rotate player to face camera direction
 if (keys["ArrowUp"]) playerModel.rotation.y = cameraAngleY;
 if (keys["ArrowDown"]) playerModel.rotation.y = cameraAngleY + Math.PI;
-
-// Update camera position around player
-let camX = playerModel.position.x + Math.sin(cameraAngleY) * cameraDistance;
-let camZ = playerModel.position.z + Math.cos(cameraAngleY) * cameraDistance;
-camera.position.set(camX, playerModel.position.y + cameraHeight, camZ);
-camera.lookAt(playerModel.position);
-}
+	updateCamera()
 
         animate();
 
@@ -882,6 +867,7 @@ if (keys["ArrowDown"]) {
     </script>
 </body>
 </html>
+
 
 
 
