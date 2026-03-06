@@ -33,6 +33,7 @@
 </head>
 <body>
     <div id="ui">
+		<p>Days Survived: <span id="days">0</span></p>
         <p>Health: <span id="health">100</span></p>
         <p>Hunger: <span id="hunger">100</span></p>
         <p>Food: <span id="food">0</span></p>
@@ -75,6 +76,8 @@ z-index:2000;
 </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
+		let daysSurvived = 0; // Counter for full days
+const daysElement = document.getElementById("days");
         // Set up the basic Three.js scene
         let scene = new THREE.Scene();
 		// Sun light
@@ -733,9 +736,15 @@ if (player.health <= 0) {
     gameOver = true;
     return;
 }
-	// ---- Day/Night Cycle ----
 // ---- Day/Night Cycle ----
-// ---- Day/Night Cycle ----
+let previousDayTime = dayTime; // store old time
+
+dayTime += daySpeed;
+if (dayTime > 1) {
+    dayTime = 0;
+    daysSurvived++;                 // Increment day counter
+    daysElement.textContent = daysSurvived; // Update UI
+}
 dayTime += daySpeed;
 if (dayTime > 1) dayTime = 0;
 
@@ -826,6 +835,7 @@ window.addEventListener("keydown", (event) => {
     </script>
 </body>
 </html>
+
 
 
 
