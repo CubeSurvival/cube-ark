@@ -452,27 +452,33 @@ for (let i = 0; i < bigRockCount; i++) {
         });
 
         // Handle player movement
-        function movePlayer() {
-            let direction = new THREE.Vector3(0, 0, 0);
+function movePlayer() {
 
-            // Reverse the controls to fix the backward issue
-            if (keys["w"]) direction.z = 1; // Move forward when pressing "W"
-            if (keys["s"]) direction.z = -1; // Move backward when pressing "S"
-            if (keys["a"]) direction.x = 1; // Move left when pressing "A"
-            if (keys["d"]) direction.x = -1;  // Move right when pressing "D"
+    let direction = new THREE.Vector3();
 
-            // Normalize to avoid faster diagonal movement
-            direction.normalize();
+    // Forward direction based on camera
+    let forward = new THREE.Vector3(
+        Math.sin(cameraAngleY),
+        0,
+        Math.cos(cameraAngleY)
+    );
 
-            // Move the player based on the direction
-            playerModel.position.addScaledVector(direction, player.speed);
+    // Right direction
+    let right = new THREE.Vector3(
+        Math.sin(cameraAngleY + Math.PI / 2),
+        0,
+        Math.cos(cameraAngleY + Math.PI / 2)
+    );
 
-            // Update the player's facing direction (turn the player model)
-            if (direction.length() > 0) {
-                let angle = Math.atan2(direction.x, direction.z); // Calculate the angle to face
-                playerModel.rotation.y = angle; // Update the player's rotation to face the new direction
-            }
-        }
+    if (keys["w"]) direction.add(forward);
+    if (keys["s"]) direction.sub(forward);
+    if (keys["a"]) direction.sub(right);
+    if (keys["d"]) direction.add(right);
+
+    direction.normalize();
+
+    playerModel.position.addScaledVector(direction, player.speed);
+}
 
         // Check for animal killing (press 'K' to kill nearby animals)
         function killAnimal() {
@@ -785,8 +791,15 @@ if (isNight && sunLight.intensity > 0.3) {
 }
 	// Camera rotation with arrow keys
 // Camera rotation
-if (keys["ArrowLeft"]) cameraAngleY -= rotateSpeed;
-if (keys["ArrowRight"]) cameraAngleY += rotateSpeed;
+if (keys["ArrowLeft"]) {
+    cameraAngleY -= rotateSpeed;
+    playerModel.rotation.y = cameraAngleY;
+}
+
+if (keys["ArrowRight"]) {
+    cameraAngleY += rotateSpeed;
+    playerModel.rotation.y = cameraAngleY;
+}
 
 // Optional: rotate player
 if (keys["ArrowUp"]) playerModel.rotation.y = cameraAngleY;
@@ -870,6 +883,7 @@ if (keys["ArrowDown"]) {
     </script>
 </body>
 </html>
+
 
 
 
